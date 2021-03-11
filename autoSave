@@ -1,0 +1,58 @@
+Sub autoSave()
+
+### 可用于excel自动保存，每隔20分钟自动保存一个附件，以名字+时间储存在指定路径
+
+Dim wb As Workbook
+Dim nam, formatTime As String
+Dim nowTime, h, m, s
+
+Application.DisplayAlerts = False
+
+
+nowTime = Timer
+h = nowTime \ 3600
+m = (nowTime - 3600 * h) \ 60
+s = Round((nowTime - 3600 * h - 60 * m), 0)
+If h < 10 Then
+    h = "0" & h
+End If
+If m < 10 Then
+    m = "0" & m
+End If
+If s < 10 Then
+    s = "0" & s
+End If
+formatTime = Format(Date, "yyyy.mm.dd") & "_" & h & "." & m & "." & s & "_"
+
+
+For Each wb In Workbooks
+
+    nam = wb.Name
+    
+    If InStr(1, nam, ".xls") = 0 Then
+        nam = nam & ".xlsm"
+    End If
+    
+    wb.SaveCopyAs ("D:\Desktop\autoSave\" & formatTime & nam)
+    
+Next
+
+
+Application.DisplayAlerts = True
+
+End Sub
+
+Sub trigg()
+
+Dim NewTime
+
+NewTime = Now + TimeValue("00:20:00")
+
+Call autoSave
+Application.OnTime NewTime, "trigg"
+
+End Sub
+
+Sub Auto_open()
+Call trigg
+End Sub
